@@ -1046,6 +1046,7 @@ struct fae_guardians_t final : public priest_buff_t<buff_t>
 struct boon_of_the_ascended_t final : public priest_buff_t<buff_t>
 {
   int stacks;
+  cooldown_t* boon_cd;
 
   boon_of_the_ascended_t( priest_t& p )
     : base_t( p, "boon_of_the_ascended", p.covenant.boon_of_the_ascended ), stacks( as<int>( data().max_stacks() ) )
@@ -1053,11 +1054,21 @@ struct boon_of_the_ascended_t final : public priest_buff_t<buff_t>
     // Adding stacks should not refresh the duration
     set_refresh_behavior( buff_refresh_behavior::DISABLED );
     set_max_stack( stacks >= 1 ? stacks : 1 );
+    boon_cd = priest().get_cooldown( "boon of the ascended" );
   }
 
   void expire_override( int expiration_stacks, timespan_t remaining_duration ) override
   {
     priest_buff_t<buff_t>::expire_override( expiration_stacks, remaining_duration );
+
+    // boonwork
+
+    if ( priest().legendary.spheres_harmony->ok() && boon_cd )
+    {
+      boon_cd->adjust( timespan_t::from_seconds(
+          std::max( priest().legendary.spheres_harmony->effectN( 1 ).base_value() * expiration_stacks,
+                    priest().legendary.spheres_harmony->effectN( 2 ).base_value() ) ) );
+    }
 
     if ( priest().options.use_ascended_eruption )
     {
@@ -1684,6 +1695,7 @@ void priest_t::init_spells()
   // Shared Legendaries
   legendary.cauterizing_shadows        = find_runeforge_legendary( "Cauterizing Shadows" );
   legendary.twins_of_the_sun_priestess = find_runeforge_legendary( "Twins of the Sun Priestess" );
+  legendary.spheres_harmony            = find_runeforge_legendary( "Spheres' Harmony" );
   // Disc legendaries
   legendary.kiss_of_death    = find_runeforge_legendary( "Kiss of Death" );
   legendary.the_penitent_one = find_runeforge_legendary( "The Penitent One" );
