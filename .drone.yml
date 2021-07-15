@@ -1,0 +1,25 @@
+kind: pipeline
+type: docker
+name: simc
+
+steps:
+- name: submodules
+  image: alpine/git
+  commands:
+  - git submodule update --init --recursive
+- name: build
+  image: archlinux:base-devel
+  privileged: true
+  commands:
+  - pacman --noconfirm -Syyu curl pkg-config clang
+  - neofetch
+  - cd engine
+  - make optimized CXX=clang
+- name: publish
+  image: plugins/github-release
+  settings:
+    api_key:
+      from_secret: github_key
+    files: engine/simc
+  when:
+    event: tag
