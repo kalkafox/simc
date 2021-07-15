@@ -15,11 +15,13 @@ steps:
   - neofetch
   - cd engine
   - make optimized CXX=clang
+  - mkdir bin
+  - mv simc bin
 - name: publish
   image: plugins/github-release
   settings:
     api_key:
       from_secret: github_key
-    files: engine/simc
+    files: engine/bin/*
   when:
     event: tag
