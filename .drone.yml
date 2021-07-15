@@ -11,7 +11,7 @@ steps:
   image: archlinux:base-devel
   privileged: true
   commands:
-  - pacman --noconfirm -Syyu curl pkg-config clang
+  - pacman --noconfirm -Syyu curl pkg-config clang neofetch
   - neofetch
   - cd engine
   - make optimized CXX=clang
