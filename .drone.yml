@@ -17,11 +17,13 @@ steps:
   - cd build
   - cmake ../ -DBUILD_GUI=OFF
   - make -j12
+  - mkdir bin
+  - mv simc bin
 - name: publish
   image: plugins/github-release
   settings:
     api_key:
       from_secret: github_key
-    files: build/simc
+    files: build/bin/*
   when:
     event: tag
